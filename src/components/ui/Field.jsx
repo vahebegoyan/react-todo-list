@@ -55,7 +55,7 @@ export default function Field({
                         onFocus={onFocus}
                         disabled={disabled}
                         readOnly={readOnly}
-                        required={required} // Added required
+                        required={required}
                         className={classes.join(' ')}
                     />
                 );
@@ -69,7 +69,7 @@ export default function Field({
                         onFocus={onFocus}
                         disabled={disabled}
                         readOnly={readOnly}
-                        required={required} // Added required
+                        required={required}
                         className={classes.join(' ')}
                     >
                         {placeholder && <option value=''>
@@ -96,13 +96,28 @@ export default function Field({
                                     onFocus={onFocus}
                                     disabled={disabled}
                                     readOnly={readOnly}
-                                    required={required} // Added required
+                                    required={required}
                                     className="mr-2"
                                 />
                                 {option.label}
                             </label>
                         ))}
                     </div>
+                );
+            case 'date':
+                return (
+                    <input
+                        type="date"
+                        id={id}
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        onFocus={onFocus}
+                        disabled={disabled}
+                        readOnly={readOnly}
+                        required={required}
+                        className={classes.join(' ')}
+                    />
                 );
             default: // 'text'
                 return (
@@ -116,12 +131,13 @@ export default function Field({
                         onFocus={onFocus}
                         disabled={disabled}
                         readOnly={readOnly}
-                        required={required} // Added required
+                        required={required}
                         className={classes.join(' ')}
                     />
                 );
         }
     };
+
 
     return (
         <div className="w-full">

@@ -1,23 +1,43 @@
-import {useRef, useState} from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from 'gsap';
+import Button from '../ui/Button';
+import Field from "../ui/Field.jsx";
 
-export default function Task({ task }) {
-    const [expanded, setExpanded] = useState(false)
+export default function Task({ task, autoExpand, onSave, deleteTask }) {
+    const [expanded, setExpanded] = useState(autoExpand);
+    const [editedTask, setEditedTask] = useState({ ...task });
     const bodyRef = useRef(null);
     const animationRef = useRef(null);
     const expanderRef = useRef(null);
-    const [animating, setAnimating] = useState(false)
+    const [animating, setAnimating] = useState(false);
+    const [priority, setPriority] = useState(task.priority || '');
+    const [status, setStatus] = useState(task.status || '');
 
-    const expand = (event) => {
+    const priorityOptions = [
+        { value: 'low', label: 'Low' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'high', label: 'High' },
+    ];
+    const statusOptions = [
+        { value: 'pending', label: 'Pending' },
+        { value: 'completed', label: 'Completed' },
+    ];
+
+    useEffect(() => {
+        if (autoExpand) {
+            expand();
+        }
+    }, [autoExpand]);
+
+    const expand = () => {
         if (bodyRef.current && !animationRef.current) {
             if (!expanded) {
-                // Expand
                 setAnimating(true);
                 gsap.to(expanderRef.current, {
                     duration: .25,
                     rotate: 90,
                     ease: "power1.inOut",
-                })
+                });
                 animationRef.current = gsap.to(bodyRef.current, {
                     duration: .25,
                     height: 'auto',
@@ -27,14 +47,13 @@ export default function Task({ task }) {
                         setExpanded(true);
                         setAnimating(false);
                     }
-                })
+                });
             } else {
-                // Expand
                 gsap.to(expanderRef.current, {
                     duration: .25,
                     rotate: 0,
                     ease: "power1.inOut",
-                })
+                });
                 animationRef.current = gsap.to(bodyRef.current, {
                     duration: .25,
                     height: 0,
@@ -44,10 +63,56 @@ export default function Task({ task }) {
                         setExpanded(false);
                         setAnimating(false);
                     }
-                })
+                });
             }
         }
-    }
+    };
+
+    const handleDelete = () => {
+        deleteTask(task.id)
+    };
+
+    const handleTitleChange = (e) => {
+        setEditedTask((prevTask) => ({
+            ...prevTask,
+            title: e.target.value
+        }));
+    };
+
+    const handleDescriptionChange = (e) => {
+        setEditedTask((prevTask) => ({
+            ...prevTask,
+            description: e.target.value
+        }));
+    };
+
+    const handleDueDateChange = (e) => {
+        setEditedTask((prevTask) => ({
+            ...prevTask,
+            dueDate: e.target.value
+        }));
+    };
+
+    const handlePriorityChange = (e) => {
+        setPriority(e.target.value);
+        setEditedTask((prevTask) => ({
+            ...prevTask,
+            priority: e.target.value
+        }));
+    };
+
+    const handleStatusChange = (e) => {
+        setStatus(e.target.value);
+        setEditedTask((prevTask) => ({
+            ...prevTask,
+            status: e.target.value
+        }));
+    };
+
+    const saveEditedTask = () => {
+        onSave({ ...editedTask, priority, status });
+    };
+
 
     return (
         <div
@@ -88,6 +153,7 @@ export default function Task({ task }) {
                 </span>
                 <span className="delete flex p-1 group/delete cursor-pointer ml-auto">
                     <svg
+                        onClick={handleDelete}
                         width="13"
                         height="14"
                         className="group-hover/delete:fill-red-500 transition-all fill-gray-600"
@@ -112,20 +178,58 @@ export default function Task({ task }) {
             {/* End Task Header */}
 
             {/* Task body */}
-            <div className="overflow-hidden " ref={bodyRef} style={ { height: 0} }>
+            <div className="overflow-hidden" ref={bodyRef} style={{ height: 0 }}>
                 <div className="flex gap-4 flex-col pt-4 border-t border-gray-700 mt-4">
-                    <span
-                        className="title text-lg font-semibold text-gray-300 focus:outline outline-gray-700 outline-offset-4 rounded-[0.05px]"
-                        contentEditable={true}
-                    >
-                        {task.title}
-                    </span>
-                    <span
-                        className="content text-gray-300 focus:outline outline-gray-700 outline-offset-4 rounded-[0.05px]"
-                        contentEditable={true}
-                    >
-                        {task.description}
-                    </span>
+                    <Field
+                        type="text"
+                        id="taskTitle"
+                        value={editedTask.title}
+                        placeholder="Task Title"
+                        onChange={handleTitleChange}
+                        label="Title"
+                        required={true}
+                    />
+                    <Field
+                        type="textarea"
+                        id="taskDescription"
+                        value={editedTask.description}
+                        placeholder="Task Description"
+                        onChange={handleDescriptionChange}
+                        label="Description"
+                        required={true}
+                    />
+                    <Field
+                        type="date"
+                        id="taskDueDate"
+                        value={editedTask.dueDate}
+                        placeholder="Due Date"
+                        onChange={handleDueDateChange}
+                        label="Due Date"
+                        required={true}
+                    />
+                    <Field
+                        type="select"
+                        id="taskPriority"
+                        value={priority}
+                        options={priorityOptions}
+                        onChange={handlePriorityChange}
+                        placeholder="Select Priority"
+                        required={true}
+                        label="Priority"
+                    />
+                    <Field
+                        type="select"
+                        id="taskStatus"
+                        value={status}
+                        options={statusOptions}
+                        onChange={handleStatusChange}
+                        placeholder="Select Status"
+                        required={true}
+                        label="Status"
+                    />
+                    <Button onClick={saveEditedTask} size="small" type="success">
+                        Save
+                    </Button>
                 </div>
             </div>
             {/* End Task Body */}

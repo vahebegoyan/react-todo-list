@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import Button from '../ui/Button';
 import Field from "../ui/Field.jsx";
 
-export default function Task({ task, autoExpand, onSave, deleteTask }) {
+export default function Task({ task, autoExpand, onSave, updateTask, deleteTask }) {
     const [expanded, setExpanded] = useState(autoExpand);
     const [editedTask, setEditedTask] = useState({ ...task });
     const bodyRef = useRef(null);
@@ -113,6 +113,10 @@ export default function Task({ task, autoExpand, onSave, deleteTask }) {
         onSave({ ...editedTask, priority, status });
     };
 
+    const changeTaskStatus = () => {
+        setStatus('completed');
+        updateTask(task);
+    }
 
     return (
         <div
@@ -144,6 +148,7 @@ export default function Task({ task, autoExpand, onSave, deleteTask }) {
                         className={task.completed ? "fill-gray-300" : "fill-transparent"}
                         width="8"
                         viewBox="0 0 448 512"
+                        onClick={changeTaskStatus}
                     >
                         <path d="M441 103c9.4 9.4 9.4 24.6 0 33.9L177 401c-9.4 9.4-24.6 9.4-33.9 0L7 265c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l119 119L407 103c9.4-9.4 24.6-9.4 33.9 0z" />
                     </svg>

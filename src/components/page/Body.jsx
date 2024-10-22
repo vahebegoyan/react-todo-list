@@ -23,7 +23,6 @@ export default function Body() {
     };
 
     const saveTask = async (task) => {
-
         await addTaskToDB(task);
     };
 
@@ -59,6 +58,10 @@ export default function Body() {
         await deleteTask(taskId);
     }
 
+    const updateTask = async (task) => {
+        updateTaskInDB({ ...task, status: 'completed' , completed: true});
+    }
+
     return (
         <div className="bg-gray-900 flex-1 flex flex-col gap-4">
             <div className="w-5/6 max-w-[736px] mt-[-25px] min-w-[300px] mx-auto flex gap-4">
@@ -75,7 +78,7 @@ export default function Body() {
                     handle=".handle"
                 >
                     {tasks.map((task) => (
-                        <Task key={task.id} task={task} onSave={saveTask} deleteTask={handleDelete}/>
+                        <Task key={task.id} task={task} onSave={saveTask} deleteTask={handleDelete} updateTask={updateTask}/>
                     ))}
                 </ReactSortable>
             </div>
